@@ -1,0 +1,7 @@
+/.venv
+/fashion-dataset
+__pycache__/
+*.pyc
+/embeddings
+/index
+/data
