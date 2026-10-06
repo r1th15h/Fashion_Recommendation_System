@@ -60,14 +60,16 @@ def calculate_color_score(
 
     query_color = str(
         query_color
-    ).lower()
+    ).lower().strip()
 
     product_color = str(
         product_color
-    ).lower()
+    ).lower().strip()
+
 
     if query_color == product_color:
         return 1.0
+
 
     return 0.0
 
@@ -129,23 +131,21 @@ def calculate_hybrid_score(
     visual_score,
     category_score,
     color_score,
-    price_score
+    price_score,
+    visual_weight=0.50,
+    category_weight=0.35,
+    color_weight=0.10,
+    price_weight=0.05
 ):
 
-    # Hybrid ranking weights
-    W_VISUAL = 0.50
-    W_CATEGORY = 0.35
-    W_COLOR = 0.10
-    W_PRICE = 0.05
-
     return (
-        W_VISUAL * visual_score
+        visual_weight * visual_score
         +
-        W_CATEGORY * category_score
+        category_weight * category_score
         +
-        W_COLOR * color_score
+        color_weight * color_score
         +
-        W_PRICE * price_score
+        price_weight * price_score
     )
 
 
@@ -153,7 +153,11 @@ def rerank_products(
     products,
     query_category=None,
     query_color=None,
-    max_price=None
+    max_price=None,
+    visual_weight=0.50,
+    category_weight=0.35,
+    color_weight=0.10,
+    price_weight=0.05
 ):
 
     ranked_products = []
@@ -198,24 +202,32 @@ def rerank_products(
                 visual_score,
                 category_score,
                 color_score,
-                price_score
+                price_score,
+                visual_weight,
+                category_weight,
+                color_weight,
+                price_weight
             )
         )
 
 
         ranked_product = product.copy()
 
+
         ranked_product[
             "category_score"
         ] = category_score
+
 
         ranked_product[
             "color_score"
         ] = color_score
 
+
         ranked_product[
             "price_score"
         ] = price_score
+
 
         ranked_product[
             "final_score"
@@ -233,5 +245,6 @@ def rerank_products(
         ],
         reverse=True
     )
+
 
     return ranked_products
